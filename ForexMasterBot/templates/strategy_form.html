@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+
+{% block title %}MT5 Forex Trading Bot - {% if strategy %}Edit{% else %}New{% endif %} Strategy{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2">{% if strategy %}Edit{% else %}New{% endif %} Strategy</h1>
+    <a href="{{ url_for('strategy_list') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Back to Strategies
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="POST" action="{% if strategy %}{{ url_for('edit_strategy', id=strategy.id) }}{% else %}{{ url_for('new_strategy') }}{% endif %}">
+            {{ form.hidden_tag() }}
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Basic Information</h5>
+                    
+                    <div class="mb-3">
+                        {{ form.name.label(class="form-label") }}
+                        {% if form.name.errors %}
+                            {{ form.name(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.name(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.strategy_type.label(class="form-label") }}
+                        {% if form.strategy_type.errors %}
+                            {{ form.strategy_type(class="form-select is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.strategy_type.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.strategy_type(class="form-select") }}
+                        {% endif %}
+                        <div class="form-text">Select the type of trading strategy to configure.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.description.label(class="form-label") }}
+                        {% if form.description.errors %}
+                            {{ form.description(class="form-control is-invalid", rows=4) }}
+                            <div class="invalid-feedback">
+                                {% for error in form.description.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.description(class="form-control", rows=4) }}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5>Strategy Parameters</h5>
+                    
+                    <!-- Moving Average RSI Strategy Parameters -->
+                    <div class="ma-rsi-field">
+                        <div class="mb-3">
+                            {{ form.slow_ma_period.label(class="form-label") }}
+                            {% if form.slow_ma_period.errors %}
+                                {{ form.slow_ma_period(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.slow_ma_period.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.slow_ma_period(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.fast_ma_period.label(class="form-label") }}
+                            {% if form.fast_ma_period.errors %}
+                                {{ form.fast_ma_period(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.fast_ma_period.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.fast_ma_period(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.rsi_period.label(class="form-label") }}
+                            {% if form.rsi_period.errors %}
+                                {{ form.rsi_period(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.rsi_period.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.rsi_period(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    {{ form.rsi_oversold.label(class="form-label") }}
+                                    {% if form.rsi_oversold.errors %}
+                                        {{ form.rsi_oversold(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.rsi_oversold.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.rsi_oversold(class="form-control") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="mb-3">
+                                    {{ form.rsi_overbought.label(class="form-label") }}
+                                    {% if form.rsi_overbought.errors %}
+                                        {{ form.rsi_overbought(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.rsi_overbought.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.rsi_overbought(class="form-control") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- MACD Strategy Parameters -->
+                    <div class="macd-field d-none">
+                        <div class="mb-3">
+                            {{ form.macd_fast_ema.label(class="form-label") }}
+                            {% if form.macd_fast_ema.errors %}
+                                {{ form.macd_fast_ema(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.macd_fast_ema.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.macd_fast_ema(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.macd_slow_ema.label(class="form-label") }}
+                            {% if form.macd_slow_ema.errors %}
+                                {{ form.macd_slow_ema(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.macd_slow_ema.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.macd_slow_ema(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.macd_signal_period.label(class="form-label") }}
+                            {% if form.macd_signal_period.errors %}
+                                {{ form.macd_signal_period(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.macd_signal_period.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.macd_signal_period(class="form-control") }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h5>Risk Management</h5>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        {{ form.risk_per_trade.label(class="form-label") }}
+                        {% if form.risk_per_trade.errors %}
+                            {{ form.risk_per_trade(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.risk_per_trade.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.risk_per_trade(class="form-control") }}
+                        {% endif %}
+                        <div class="form-text">Percentage of account balance to risk per trade.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.max_risk_total.label(class="form-label") }}
+                        {% if form.max_risk_total.errors %}
+                            {{ form.max_risk_total(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.max_risk_total.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.max_risk_total(class="form-control") }}
+                        {% endif %}
+                        <div class="form-text">Maximum total risk across all open trades.</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        {{ form.use_atr_for_sl.label(class="form-check-label") }}
+                        <div class="form-check form-switch">
+                            {% if form.use_atr_for_sl.errors %}
+                                {{ form.use_atr_for_sl(class="form-check-input is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.use_atr_for_sl.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.use_atr_for_sl(class="form-check-input") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-text">Use ATR-based dynamic stop loss instead of fixed pips.</div>
+                    </div>
+                    
+                    <div class="mb-3 atr-field">
+                        {{ form.atr_period.label(class="form-label") }}
+                        {% if form.atr_period.errors %}
+                            {{ form.atr_period(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.atr_period.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.atr_period(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3 atr-field">
+                        {{ form.atr_multiplier.label(class="form-label") }}
+                        {% if form.atr_multiplier.errors %}
+                            {{ form.atr_multiplier(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.atr_multiplier.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.atr_multiplier(class="form-control") }}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="mb-3 fixed-sl-field">
+                        {{ form.fixed_sl_pips.label(class="form-label") }}
+                        {% if form.fixed_sl_pips.errors %}
+                            {{ form.fixed_sl_pips(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.fixed_sl_pips.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.fixed_sl_pips(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3 fixed-tp-field">
+                        {{ form.fixed_tp_pips.label(class="form-label") }}
+                        {% if form.fixed_tp_pips.errors %}
+                            {{ form.fixed_tp_pips(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.fixed_tp_pips.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.fixed_tp_pips(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.risk_reward_ratio.label(class="form-label") }}
+                        {% if form.risk_reward_ratio.errors %}
+                            {{ form.risk_reward_ratio(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.risk_reward_ratio.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.risk_reward_ratio(class="form-control") }}
+                        {% endif %}
+                        <div class="form-text">Target profit to risk ratio (e.g., 2.0 means TP is twice the SL).</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{{ url_for('strategy_list') }}" class="btn btn-outline-secondary me-md-2">Cancel</a>
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const useAtrToggle = document.getElementById('use_atr_for_sl');
+        const atrFields = document.querySelectorAll('.atr-field');
+        const fixedSlFields = document.querySelectorAll('.fixed-sl-field');
+        
+        function toggleFields() {
+            if (useAtrToggle.checked) {
+                atrFields.forEach(field => field.classList.remove('d-none'));
+                fixedSlFields.forEach(field => field.classList.add('d-none'));
+            } else {
+                atrFields.forEach(field => field.classList.add('d-none'));
+                fixedSlFields.forEach(field => field.classList.remove('d-none'));
+            }
+        }
+        
+        useAtrToggle.addEventListener('change', toggleFields);
+        toggleFields();
+    });
+</script>
+{% endblock %}

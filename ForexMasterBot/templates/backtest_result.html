@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block title %}MT5 Forex Trading Bot - Backtest Results{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2">Backtest Results</h1>
+    <div>
+        <a href="{{ url_for('strategy_detail', id=result.strategy_id) }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back to Strategy
+        </a>
+        <a href="{{ url_for('run_backtest', id=result.strategy_id) }}" class="btn btn-outline-primary ms-2">
+            <i class="fas fa-redo me-1"></i> New Backtest
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Strategy:</strong> {{ strategy.name }}</p>
+                        <p><strong>Symbol:</strong> {{ result.symbol }}</p>
+                        <p><strong>Timeframe:</strong> {{ result.timeframe }}</p>
+                        <p><strong>Period:</strong> {{ result.start_date.strftime('%Y-%m-%d') }} to {{ result.end_date.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Initial Balance:</strong> ${{ result.initial_balance|round(2) }}</p>
+                        <p><strong>Final Balance:</strong> ${{ result.final_balance|round(2) }}</p>
+                        <p><strong>Profit/Loss:</strong> <span class="{% if result.final_balance > result.initial_balance %}text-success{% else %}text-danger{% endif %}">
+                            ${{ (result.final_balance - result.initial_balance)|round(2) }} 
+                            ({{ (((result.final_balance / result.initial_balance) - 1) * 100)|round(2) }}%)
+                        </span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Key Metrics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Total Trades:</strong> {{ result.total_trades }}</p>
+                        <p><strong>Winning Trades:</strong> <span class="text-success">{{ result.profitable_trades }}</span></p>
+                        <p><strong>Losing Trades:</strong> <span class="text-danger">{{ result.losing_trades }}</span></p>
+                        <p><strong>Win Rate:</strong> {{ (result.win_rate * 100)|round(2) }}%</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Profit Factor:</strong> {{ result.profit_factor|round(2) }}</p>
+                        <p><strong>Max Drawdown:</strong> <span class="text-danger">${{ result.max_drawdown|round(2) }} ({{ result.max_drawdown_percent|round(2) }}%)</span></p>
+                        <p><strong>Sharpe Ratio:</strong> {{ result.sharpe_ratio|round(2) if result.sharpe_ratio else 'N/A' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">Equity Curve</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="equityCurveChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Trade History</h5>
+                <button class="btn btn-sm btn-outline-secondary" id="toggleTradesBtn">
+                    <i class="fas fa-table me-1"></i> Show All Trades
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tradesTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Open Time</th>
+                                <th>Close Time</th>
+                                <th>Type</th>
+                                <th>Size</th>
+                                <th>Entry</th>
+                                <th>Exit</th>
+                                <th>SL</th>
+                                <th>TP</th>
+                                <th>P/L</th>
+                                <th>P/L %</th>
+                                <th>Exit Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Trades will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">Trades Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="tradesDistributionChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">Monthly Performance</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="monthlyPerformanceChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Parse data from server
+    const equityCurveData = {{ result.equity_curve|safe }};
+    const tradesData = {{ result.trades_data|safe }};
+    
+    // ---------------- Equity Curve Chart ----------------
+    const equityCurveCtx = document.getElementById('equityCurveChart').getContext('2d');
+    
+    // Extract data for charting
+    const dates = equityCurveData.map(point => new Date(point.date));
+    const equity = equityCurveData.map(point => point.equity);
+    const drawdowns = equityCurveData.map(point => point.drawdown_pct);
+    
+    const equityCurveChart = new Chart(equityCurveCtx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [
+                {
+                    label: 'Equity',
+                    data: equity,
+                    borderColor: '#4c6ef5',
+                    backgroundColor: 'rgba(76, 110, 245, 0.1)',
+                    fill: true,
+                    tension: 0.1,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Drawdown %',
+                    data: drawdowns,
+                    borderColor: '#fa5252',
+                    backgroundColor: 'rgba(250, 82, 82, 0.1)',
+                    fill: true,
+                    tension: 0.1,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day'
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Equity ($)'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Drawdown (%)'
+                    },
+                    max: 0,
+                    min: -{{ result.max_drawdown_percent|round(0) + 5 }},
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            }
+        }
+    });
+    
+    // ---------------- Trades Distribution Chart ----------------
+    const tradesDistributionCtx = document.getElementById('tradesDistributionChart').getContext('2d');
+    
+    // Calculate profit and loss counts by day of week
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayDistribution = [0, 0, 0, 0, 0, 0, 0].map(() => ({ wins: 0, losses: 0 }));
+    
+    tradesData.forEach(trade => {
+        const openDate = new Date(trade.open_time);
+        const dayOfWeek = openDate.getDay();
+        
+        if (trade.profit > 0) {
+            dayDistribution[dayOfWeek].wins++;
+        } else {
+            dayDistribution[dayOfWeek].losses++;
+        }
+    });
+    
+    const wins = dayDistribution.map(day => day.wins);
+    const losses = dayDistribution.map(day => -day.losses); // Negative for stacking below zero
+    
+    const tradesDistributionChart = new Chart(tradesDistributionCtx, {
+        type: 'bar',
+        data: {
+            labels: daysOfWeek,
+            datasets: [
+                {
+                    label: 'Winning Trades',
+                    data: wins,
+                    backgroundColor: 'rgba(40, 167, 69, 0.7)'
+                },
+                {
+                    label: 'Losing Trades',
+                    data: losses,
+                    backgroundColor: 'rgba(220, 53, 69, 0.7)'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    stacked: true
+                },
+                y: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Trades'
+                    }
+                }
+            }
+        }
+    });
+    
+    // ---------------- Monthly Performance Chart ----------------
+    const monthlyPerformanceCtx = document.getElementById('monthlyPerformanceChart').getContext('2d');
+    
+    // Calculate monthly performance
+    const monthlyPerformance = {};
+    
+    tradesData.forEach(trade => {
+        if (!trade.close_time) return; // Skip open trades
+        
+        const closeDate = new Date(trade.close_time);
+        const monthYear = `${closeDate.getFullYear()}-${(closeDate.getMonth() + 1).toString().padStart(2, '0')}`;
+        
+        if (!monthlyPerformance[monthYear]) {
+            monthlyPerformance[monthYear] = 0;
+        }
+        
+        monthlyPerformance[monthYear] += trade.profit;
+    });
+    
+    const sortedMonths = Object.keys(monthlyPerformance).sort();
+    const monthlyProfits = sortedMonths.map(month => monthlyPerformance[month]);
+    
+    const monthlyPerformanceChart = new Chart(monthlyPerformanceCtx, {
+        type: 'bar',
+        data: {
+            labels: sortedMonths,
+            datasets: [{
+                label: 'Profit/Loss ($)',
+                data: monthlyProfits,
+                backgroundColor: monthlyProfits.map(profit => 
+                    profit >= 0 ? 'rgba(40, 167, 69, 0.7)' : 'rgba(220, 53, 69, 0.7)'
+                )
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Profit/Loss ($)'
+                    }
+                }
+            }
+        }
+    });
+    
+    // ---------------- Trades Table ----------------
+    const tradesTable = document.getElementById('tradesTable').getElementsByTagName('tbody')[0];
+    const toggleTradesBtn = document.getElementById('toggleTradesBtn');
+    let showAllTrades = false;
+    
+    function populateTradesTable() {
+        // Clear table
+        tradesTable.innerHTML = '';
+        
+        // Sort trades by open time
+        const sortedTrades = [...tradesData].sort((a, b) => 
+            new Date(a.open_time) - new Date(b.open_time)
+        );
+        
+        // Limit to 10 most recent trades unless showing all
+        const tradesToShow = showAllTrades ? sortedTrades : sortedTrades.slice(-10);
+        
+        tradesToShow.forEach((trade, index) => {
+            const row = tradesTable.insertRow();
+            
+            // Profit/Loss styling
+            const profitLossClass = trade.profit >= 0 ? 'text-success' : 'text-danger';
+            
+            // Add cells
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${new Date(trade.open_time).toLocaleString()}</td>
+                <td>${trade.close_time ? new Date(trade.close_time).toLocaleString() : 'Open'}</td>
+                <td><span class="${trade.trade_type === 'BUY' ? 'text-success' : 'text-danger'}">${trade.trade_type}</span></td>
+                <td>${trade.volume}</td>
+                <td>${trade.open_price.toFixed(5)}</td>
+                <td>${trade.close_price ? trade.close_price.toFixed(5) : '-'}</td>
+                <td>${trade.stop_loss ? trade.stop_loss.toFixed(5) : '-'}</td>
+                <td>${trade.take_profit ? trade.take_profit.toFixed(5) : '-'}</td>
+                <td class="${profitLossClass}">${trade.profit ? trade.profit.toFixed(2) : '-'}</td>
+                <td class="${profitLossClass}">${trade.profit ? (trade.profit / (trade.volume * {{ result.initial_balance }} * 0.01)).toFixed(2) + '%' : '-'}</td>
+                <td>${trade.exit_reason || '-'}</td>
+            `;
+        });
+    }
+    
+    // Initial table population
+    populateTradesTable();
+    
+    // Toggle button
+    toggleTradesBtn.addEventListener('click', function() {
+        showAllTrades = !showAllTrades;
+        populateTradesTable();
+        toggleTradesBtn.innerHTML = showAllTrades ? 
+            '<i class="fas fa-table me-1"></i> Show Recent Trades' : 
+            '<i class="fas fa-table me-1"></i> Show All Trades';
+    });
+});
+</script>
+{% endblock %}

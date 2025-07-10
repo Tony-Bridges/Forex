@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>AI Trading Trades</h1>
+                <a href="{{ url_for('ai_trading') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Positions -->
+    {% if positions %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Current Positions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Ticket</th>
+                                    <th>Symbol</th>
+                                    <th>Type</th>
+                                    <th>Volume</th>
+                                    <th>Open Price</th>
+                                    <th>Current Price</th>
+                                    <th>Profit</th>
+                                    <th>Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for position in positions %}
+                                <tr>
+                                    <td>{{ position.ticket }}</td>
+                                    <td><strong>{{ position.symbol }}</strong></td>
+                                    <td>
+                                        <span class="badge {% if position.type == 'BUY' %}badge-success{% else %}badge-danger{% endif %}">
+                                            {{ position.type }}
+                                        </span>
+                                    </td>
+                                    <td>{{ position.volume }}</td>
+                                    <td>{{ "%.5f"|format(position.price_open) }}</td>
+                                    <td>{{ "%.5f"|format(position.price_current) }}</td>
+                                    <td class="{% if position.profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        ${{ "%.2f"|format(position.profit) }}
+                                    </td>
+                                    <td><small>{{ position.comment }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Trade History -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Trade History</h5>
+                </div>
+                <div class="card-body">
+                    {% if trades %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Ticket</th>
+                                        <th>Symbol</th>
+                                        <th>Type</th>
+                                        <th>Volume</th>
+                                        <th>Open Price</th>
+                                        <th>Close Price</th>
+                                        <th>Profit</th>
+                                        <th>Status</th>
+                                        <th>Comment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for trade in trades %}
+                                    <tr>
+                                        <td>{{ trade.open_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>{{ trade.ticket }}</td>
+                                        <td><strong>{{ trade.symbol }}</strong></td>
+                                        <td>
+                                            <span class="badge {% if trade.trade_type == 'BUY' %}badge-success{% else %}badge-danger{% endif %}">
+                                                {{ trade.trade_type }}
+                                            </span>
+                                        </td>
+                                        <td>{{ trade.volume }}</td>
+                                        <td>{{ "%.5f"|format(trade.open_price) }}</td>
+                                        <td>
+                                            {% if trade.close_price %}
+                                                {{ "%.5f"|format(trade.close_price) }}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="{% if trade.profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if trade.profit %}
+                                                ${{ "%.2f"|format(trade.profit) }}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if trade.status == 'OPEN' %}badge-primary{% elif trade.status == 'CLOSED' %}badge-secondary{% else %}badge-warning{% endif %}">
+                                                {{ trade.status }}
+                                            </span>
+                                        </td>
+                                        <td><small>{{ trade.comment }}</small></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination could be added here -->
+                        {% if trades|length == 100 %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Showing latest 100 trades. 
+                            <a href="#" onclick="loadMoreTrades()">Load more</a>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No trades have been executed yet. 
+                            Start AI trading to see your trades here.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function loadMoreTrades() {
+    // Implement pagination/loading more trades
+    alert('Load more trades functionality would be implemented here');
+}
+
+// Auto-refresh trades every 30 seconds
+setInterval(function() {
+    if (window.location.pathname === '/ai_trading/trades') {
+        location.reload();
+    }
+}, 30000);
+</script>
+{% endblock %}

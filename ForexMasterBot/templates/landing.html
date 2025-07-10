@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="px-4 py-5 my-5 text-center">
+    <div class="d-flex justify-content-center mb-4">
+        <div class="rounded-circle bg-primary p-3 d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+            <i class="fas fa-robot text-white fa-3x"></i>
+        </div>
+    </div>
+    <h1 class="display-4 fw-bold">MT5 Trading Bot</h1>
+    <div class="col-lg-8 mx-auto">
+        <p class="lead mb-4">
+            An advanced Forex trading bot with AI-powered strategy enhancement, comprehensive backtesting, and sophisticated risk management.
+        </p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4 gap-3">Sign Up</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg px-4">Login</a>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-5 py-5">
+        <div class="col-md-4">
+            <div class="card bg-dark h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-primary bg-opacity-25 p-3 d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-chart-line text-primary fa-2x"></i>
+                    </div>
+                    <h3 class="card-title">Advanced Strategies</h3>
+                    <p class="card-text">
+                        Multiple technical analysis strategies including Moving Average, RSI, MACD, and more. Fully customizable parameters for optimal performance.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-danger bg-opacity-25 p-3 d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-shield-alt text-danger fa-2x"></i>
+                    </div>
+                    <h3 class="card-title">Risk Management</h3>
+                    <p class="card-text">
+                        Comprehensive risk controls with dynamic position sizing, drawdown protection, and adaptive stop-loss placement based on market volatility.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-success bg-opacity-25 p-3 d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-brain text-success fa-2x"></i>
+                    </div>
+                    <h3 class="card-title">AI Enhancement</h3>
+                    <p class="card-text">
+                        Machine learning models continuously optimize strategy parameters and provide market insights to improve trading performance over time.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-dark py-5">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h2 class="fw-bold">Advanced Backtesting</h2>
+                <p class="lead">
+                    Test your strategies on historical data with sophisticated backtesting features:
+                </p>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Multi-timeframe analysis</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Realistic slippage and spread simulation</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Detailed performance metrics</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Interactive equity curve visualization</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Trade-by-trade analysis</li>
+                </ul>
+                <div class="mt-4">
+                    <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div style="height: 350px; background-color: #1a202c; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <p class="text-muted">Backtesting performance chart visualization</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Supported Currency Pairs</h2>
+        <p class="lead">The MT5 Trading Bot supports all major, minor, and exotic currency pairs</p>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="card bg-dark">
+                <div class="card-body text-center">
+                    <h4 class="card-title">EUR/USD</h4>
+                    <p class="card-text text-muted">Euro / US Dollar</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card bg-dark">
+                <div class="card-body text-center">
+                    <h4 class="card-title">GBP/USD</h4>
+                    <p class="card-text text-muted">British Pound / US Dollar</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card bg-dark">
+                <div class="card-body text-center">
+                    <h4 class="card-title">USD/JPY</h4>
+                    <p class="card-text text-muted">US Dollar / Japanese Yen</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card bg-dark">
+                <div class="card-body text-center">
+                    <h4 class="card-title">USD/CHF</h4>
+                    <p class="card-text text-muted">US Dollar / Swiss Franc</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card bg-dark">
+                <div class="card-body text-center">
+                    <h4 class="card-title">AUD/USD</h4>
+                    <p class="card-text text-muted">Australian Dollar / US Dollar</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card bg-dark">
+                <div class="card-body text-center">
+                    <h4 class="card-title">EUR/GBP</h4>
+                    <p class="card-text text-muted">Euro / British Pound</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card bg-dark">
+                <div class="card-body text-center">
+                    <h4 class="card-title">USD/CAD</h4>
+                    <p class="card-text text-muted">US Dollar / Canadian Dollar</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card bg-dark">
+                <div class="card-body text-center">
+                    <h4 class="card-title">NZD/USD</h4>
+                    <p class="card-text text-muted">New Zealand Dollar / US Dollar</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

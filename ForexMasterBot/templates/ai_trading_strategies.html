@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>AI Trading Strategies</h1>
+                <a href="{{ url_for('ai_trading') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Your Strategies</h5>
+                </div>
+                <div class="card-body">
+                    {% if user_strategies %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Risk %</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for strategy in user_strategies %}
+                                    <tr>
+                                        <td>{{ strategy.name }}</td>
+                                        <td>
+                                            <span class="badge badge-info">{{ strategy.strategy_type }}</span>
+                                        </td>
+                                        <td>{{ strategy.risk_per_trade }}%</td>
+                                        <td>
+                                            {% if strategy.id in active_strategies %}
+                                                <span class="badge badge-success">Active</span>
+                                            {% else %}
+                                                <span class="badge badge-secondary">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if strategy.id in active_strategies %}
+                                                <a href="{{ url_for('ai_trading_remove_strategy', strategy_id=strategy.id) }}" 
+                                                   class="btn btn-sm btn-danger"
+                                                   onclick="return confirm('Remove this strategy from AI trading?')">
+                                                    <i class="fas fa-minus"></i> Remove
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ url_for('ai_trading_add_strategy', strategy_id=strategy.id) }}" 
+                                                   class="btn btn-sm btn-success">
+                                                    <i class="fas fa-plus"></i> Add
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> You don't have any strategies yet. 
+                            <a href="{{ url_for('create_strategy') }}">Create your first strategy</a> to get started with AI trading.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Active AI Trading Strategies</h5>
+                </div>
+                <div class="card-body">
+                    {% if active_strategies %}
+                        {% for strategy_id, strategy_config in active_strategies.items() %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="card-title">{{ strategy_config.name }}</h6>
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                Type: {{ strategy_config.type }}<br>
+                                                Risk: {{ strategy_config.parameters.risk_per_trade }}%
+                                            </small>
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <span class="badge badge-success">Active</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        {% if strategy_config.type == 'MA_RSI' %}
+                                            MA: {{ strategy_config.parameters.fast_ma_period }}/{{ strategy_config.parameters.slow_ma_period }}, 
+                                            RSI: {{ strategy_config.parameters.rsi_period }}
+                                        {% elif strategy_config.type == 'MACD' %}
+                                            MACD: {{ strategy_config.parameters.macd_fast_ema }}/{{ strategy_config.parameters.macd_slow_ema }}/{{ strategy_config.parameters.macd_signal_period }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> No strategies are currently active in AI trading.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Strategy Performance</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Strategy performance metrics will be displayed here once trading begins.</p>
+                    <!-- Add charts and performance metrics here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

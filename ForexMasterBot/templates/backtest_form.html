@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}MT5 Forex Trading Bot - Backtest Strategy{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2">Backtest Strategy: {{ strategy.name }}</h1>
+    <a href="{{ url_for('strategy_detail', id=strategy.id) }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Back to Strategy
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('run_backtest', id=strategy.id) }}">
+            {{ form.hidden_tag() }}
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Backtest Parameters</h5>
+                    
+                    <div class="mb-3">
+                        {{ form.symbol.label(class="form-label") }}
+                        {% if form.symbol.errors %}
+                            {{ form.symbol(class="form-select is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.symbol.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.symbol(class="form-select") }}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.timeframe.label(class="form-label") }}
+                        {% if form.timeframe.errors %}
+                            {{ form.timeframe(class="form-select is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.timeframe.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.timeframe(class="form-select") }}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                {{ form.start_date.label(class="form-label") }}
+                                {% if form.start_date.errors %}
+                                    {{ form.start_date(class="form-control is-invalid", type="date") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.start_date.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.start_date(class="form-control", type="date") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                {{ form.end_date.label(class="form-label") }}
+                                {% if form.end_date.errors %}
+                                    {{ form.end_date(class="form-control is-invalid", type="date") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.end_date.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.end_date(class="form-control", type="date") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5>Account Settings</h5>
+                    
+                    <div class="mb-3">
+                        {{ form.initial_balance.label(class="form-label") }}
+                        {% if form.initial_balance.errors %}
+                            {{ form.initial_balance(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.initial_balance.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.initial_balance(class="form-control") }}
+                        {% endif %}
+                        <div class="form-text">Starting account balance for the backtest.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.lot_size.label(class="form-label") }}
+                        {% if form.lot_size.errors %}
+                            {{ form.lot_size(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.lot_size.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.lot_size(class="form-control") }}
+                        {% endif %}
+                        <div class="form-text">Size of each trade in lots (1.0 = 100,000 units).</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.use_dynamic_lot_size.label(class="form-check-label") }}
+                        <div class="form-check form-switch">
+                            {% if form.use_dynamic_lot_size.errors %}
+                                {{ form.use_dynamic_lot_size(class="form-check-input is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.use_dynamic_lot_size.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.use_dynamic_lot_size(class="form-check-input") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-text">When enabled, lot size will be calculated based on risk per trade.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                {{ form.comments.label(class="form-label") }}
+                {% if form.comments.errors %}
+                    {{ form.comments(class="form-control is-invalid", rows=3) }}
+                    <div class="invalid-feedback">
+                        {% for error in form.comments.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.comments(class="form-control", rows=3) }}
+                {% endif %}
+                <div class="form-text">Optional notes for this backtest.</div>
+            </div>
+            
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-play-circle me-1"></i> Run Backtest
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Toggle relevant fields based on selected strategy type
+    document.addEventListener('DOMContentLoaded', function() {
+        const dynamicLotSizeCheckbox = document.querySelector('#use_dynamic_lot_size');
+        const lotSizeField = document.querySelector('#lot_size').closest('.mb-3');
+        
+        function updateVisibility() {
+            if (dynamicLotSizeCheckbox.checked) {
+                lotSizeField.classList.add('d-none');
+            } else {
+                lotSizeField.classList.remove('d-none');
+            }
+        }
+        
+        dynamicLotSizeCheckbox.addEventListener('change', updateVisibility);
+        updateVisibility();
+    });
+</script>
+{% endblock %}

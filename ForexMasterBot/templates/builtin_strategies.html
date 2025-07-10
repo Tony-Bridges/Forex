@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Built-in Trading Strategies</h1>
+                <a href="{{ url_for('strategy_list') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to My Strategies
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h5><i class="fas fa-lightbulb"></i> Professional Trading Strategies</h5>
+                <p class="mb-0">These are battle-tested strategies used by professional traders. Each strategy has been optimized for different market conditions and trading styles. You can create your own copy and customize the parameters to match your trading preferences.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for strategy in strategies %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{{ strategy.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ strategy.description }}</p>
+                    
+                    <!-- Strategy Type Badge -->
+                    <div class="mb-3">
+                        {% if strategy.type == 'TREND_CROSSOVER' %}
+                            <span class="badge badge-success">🔁 Trend Following</span>
+                        {% elif strategy.type == 'BREAKOUT' %}
+                            <span class="badge badge-warning">📉 Breakout</span>
+                        {% elif strategy.type == 'MEAN_REVERSION' %}
+                            <span class="badge badge-info">📊 Mean Reversion</span>
+                        {% elif strategy.type == 'SCALPING' %}
+                            <span class="badge badge-danger">⚡ Scalping</span>
+                        {% elif strategy.type == 'MULTI_SIGNAL' %}
+                            <span class="badge badge-primary">🧠 AI-Driven</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Strategy Details -->
+                    <div class="small text-muted mb-3">
+                        {% if strategy.type == 'TREND_CROSSOVER' %}
+                            <strong>Tools:</strong> 50/200 EMA, MACD, ATR<br>
+                            <strong>Type:</strong> Swing/Position<br>
+                            <strong>Best For:</strong> Trending markets
+                        {% elif strategy.type == 'BREAKOUT' %}
+                            <strong>Tools:</strong> Volume, S/R zones, Inside bars<br>
+                            <strong>Type:</strong> Day/Swing<br>
+                            <strong>Best For:</strong> Volatile breakouts
+                        {% elif strategy.type == 'MEAN_REVERSION' %}
+                            <strong>Tools:</strong> RSI, Bollinger Bands, VWAP<br>
+                            <strong>Type:</strong> Intraday/Swing<br>
+                            <strong>Best For:</strong> Range-bound markets
+                        {% elif strategy.type == 'SCALPING' %}
+                            <strong>Tools:</strong> VWAP, EMA 9/21, Liquidity<br>
+                            <strong>Type:</strong> Ultra Short-Term<br>
+                            <strong>Best For:</strong> High-frequency trading
+                        {% elif strategy.type == 'MULTI_SIGNAL' %}
+                            <strong>Tools:</strong> MACD+RSI+EMA+Volume<br>
+                            <strong>Type:</strong> Automated<br>
+                            <strong>Best For:</strong> Consistent execution
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group w-100">
+                        <a href="{{ url_for('preview_builtin_strategy', strategy_type=strategy.type) }}" 
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-eye"></i> Preview
+                        </a>
+                        <a href="{{ url_for('create_builtin_strategy', strategy_type=strategy.type) }}" 
+                           class="btn btn-success">
+                            <i class="fas fa-plus"></i> Create
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Strategy Comparison -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Strategy Comparison Guide</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Strategy</th>
+                                    <th>Market Condition</th>
+                                    <th>Time Commitment</th>
+                                    <th>Risk Level</th>
+                                    <th>Automation Level</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Trend Crossover</strong></td>
+                                    <td>Trending markets</td>
+                                    <td>Low (Weekly checks)</td>
+                                    <td>Medium</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Breakout</strong></td>
+                                    <td>Volatile periods</td>
+                                    <td>Medium (Daily)</td>
+                                    <td>Medium-High</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mean Reversion</strong></td>
+                                    <td>Range-bound</td>
+                                    <td>Medium (Daily)</td>
+                                    <td>Medium</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Scalping</strong></td>
+                                    <td>High liquidity</td>
+                                    <td>High (Constant)</td>
+                                    <td>Low (per trade)</td>
+                                    <td>Very High</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Multi-Signal</strong></td>
+                                    <td>All conditions</td>
+                                    <td>Very Low</td>
+                                    <td>Adaptive</td>
+                                    <td>Maximum</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

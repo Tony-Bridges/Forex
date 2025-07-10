@@ -1,0 +1,95 @@
+[2025-04-29 09:11:42 +0000] [3657] [INFO] Starting gunicorn 23.0.0
+[2025-04-29 09:11:42 +0000] [3657] [INFO] Listening at: http://0.0.0.0:5000 (3657)
+[2025-04-29 09:11:42 +0000] [3657] [INFO] Using worker: sync
+[2025-04-29 09:11:42 +0000] [3668] [INFO] Booting worker with pid: 3668
+2025-04-29 09:11:43,203 - app - INFO - Creating database tables...
+2025-04-29 09:11:45,234 - app - INFO - Database tables created successfully.
+[2025-04-29 09:26:17 +0000] [3668] [INFO] Worker reloading: /home/runner/workspace/views.py modified
+[2025-04-29 09:26:17 +0000] [3668] [INFO] Worker exiting (pid: 3668)
+[2025-04-29 09:26:17 +0000] [4124] [INFO] Booting worker with pid: 4124
+2025-04-29 09:26:18,828 - app - INFO - Creating database tables...
+2025-04-29 09:26:20,750 - app - INFO - Database tables created successfully.
+2025-04-29 09:28:28,099 - app - ERROR - Exception on /dashboard [GET]
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UndefinedColumn: column trade.user_id does not exist
+LINE 2: ...rade_exit_reason, trade.comment AS trade_comment, trade.user...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/views.py", line 54, in dashboard
+    trade_count = Trade.query.filter(Trade.user_id==current_user.id).count()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 3147, in count
+    self._legacy_from_self(col).enable_eagerloads(False).scalar()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2836, in scalar
+    ret = self.one()
+          ^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2809, in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2858, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column trade.user_id does not exist
+LINE 2: ...rade_exit_reason, trade.comment AS trade_comment, trade.user...
+                                                             ^
+
+[SQL: SELECT count(*) AS count_1 
+FROM (SELECT trade.id AS trade_id, trade.ticket AS trade_ticket, trade.symbol AS trade_symbol, trade.trade_type AS trade_trade_type, trade.volume AS trade_volume, trade.open_price AS trade_open_price, trade.close_price AS trade_close_price, trade.stop_loss AS trade_stop_loss, trade.take_profit AS trade_take_profit, trade.open_time AS trade_open_time, trade.close_time AS trade_close_time, trade.profit AS trade_profit, trade.pips AS trade_pips, trade.status AS trade_status, trade.exit_reason AS trade_exit_reason, trade.comment AS trade_comment, trade.user_id AS trade_user_id, trade.account_id AS trade_account_id 
+FROM trade 
+WHERE trade.user_id = %(user_id_1)s) AS anon_1]
+[parameters: {'user_id_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2025-04-29 09:28:45 +0000] [3657] [INFO] Handling signal: winch
+[2025-04-29 09:28:45 +0000] [3657] [INFO] Handling signal: winch

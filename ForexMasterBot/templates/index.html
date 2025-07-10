@@ -1,0 +1,443 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+            <div class="position-sticky pt-3">
+                <div class="px-3 py-2 border-bottom border-secondary">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-primary p-2 me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-robot text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0 fs-5">MT5 Forex Bot</h3>
+                            <small class="text-muted">v1.0.0</small>
+                        </div>
+                    </div>
+                </div>
+                <ul class="nav flex-column mt-3">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-chart-line me-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('strategy_list') }}">
+                            <i class="fas fa-cogs me-2"></i>
+                            Strategies
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-exchange-alt me-2"></i>
+                            Trades
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            Risk Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-history me-2"></i>
+                            Backtesting
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-brain me-2"></i>
+                            AI Models
+                        </a>
+                    </li>
+                </ul>
+                
+                {% if accounts %}
+                <div class="mt-4 px-3">
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-1 text-muted">
+                        <span>ACCOUNT</span>
+                    </h6>
+                    <div class="border-start border-primary ps-2 mt-2">
+                        {% for account in accounts[:1] %}
+                        <div class="small mb-1 d-flex justify-content-between">
+                            <span>Balance:</span>
+                            <span class="fw-bold">${{ account.balance|round(2) }}</span>
+                        </div>
+                        {% endfor %}
+                        <div class="small mb-1 d-flex justify-content-between">
+                            <span>Equity:</span>
+                            <span class="fw-bold">$10,189.32</span>
+                        </div>
+                        <div class="small mb-1 d-flex justify-content-between">
+                            <span>Margin:</span>
+                            <span class="fw-bold">$1,024.57</span>
+                        </div>
+                        <div class="small mb-1 d-flex justify-content-between">
+                            <span>Free Margin:</span>
+                            <span class="fw-bold">$9,164.75</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 ms-auto">
+            <!-- Header -->
+            <div class="bg-primary bg-gradient p-3 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="fs-4 mb-0 text-white">Forex Trading Bot Dashboard</h2>
+                    <div class="d-flex">
+                        <div class="input-group me-3" style="width: 250px;">
+                            <span class="input-group-text bg-dark border-0">
+                                <i class="fas fa-search text-light"></i>
+                            </span>
+                            <input type="text" class="form-control bg-dark text-light border-0" placeholder="Search...">
+                        </div>
+                        <button class="btn btn-success">
+                            <i class="fas fa-play me-2"></i>
+                            Start Bot
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Assistants -->
+            <div class="bg-dark p-2 border-bottom border-secondary">
+                <div class="row g-2">
+                    <!-- Risk AI -->
+                    <div class="col-md-4">
+                        <div class="card bg-dark border-danger">
+                            <div class="card-header bg-danger bg-opacity-25 d-flex align-items-center">
+                                <div class="rounded-circle bg-danger bg-opacity-25 p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="fas fa-shield-alt text-danger"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-0">Risk AI</h6>
+                                    <small class="text-muted">Monitoring exposure...</small>
+                                </div>
+                                <div class="bg-success rounded-circle" style="width: 10px; height: 10px;"></div>
+                            </div>
+                            <div class="card-body p-2">
+                                <p class="card-text small">
+                                    Current risk exposure is optimal at 1.8% per trade. No immediate threats detected.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Analysis AI -->
+                    <div class="col-md-4">
+                        <div class="card bg-dark border-primary">
+                            <div class="card-header bg-primary bg-opacity-25 d-flex align-items-center">
+                                <div class="rounded-circle bg-primary bg-opacity-25 p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="fas fa-brain text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-0">Analysis AI</h6>
+                                    <small class="text-muted">Detecting patterns...</small>
+                                </div>
+                                <div class="bg-success rounded-circle" style="width: 10px; height: 10px;"></div>
+                            </div>
+                            <div class="card-body p-2">
+                                <p class="card-text small">
+                                    MACD divergence suggests potential reversal on EUR/USD. Consider adjusting entry points.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance AI -->
+                    <div class="col-md-4">
+                        <div class="card bg-dark border-info">
+                            <div class="card-header bg-info bg-opacity-25 d-flex align-items-center">
+                                <div class="rounded-circle bg-info bg-opacity-25 p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="fas fa-tachometer-alt text-info"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-0">Performance AI</h6>
+                                    <small class="text-muted">Optimizing accuracy...</small>
+                                </div>
+                                <div class="bg-success rounded-circle" style="width: 10px; height: 10px;"></div>
+                            </div>
+                            <div class="card-body p-2">
+                                <p class="card-text small">
+                                    Current win rate at 68.4% (up 2.1%). MA crossover strategy showing 74% accuracy.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="p-3">
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card bg-dark border-success h-100">
+                            <div class="card-body">
+                                <h6 class="card-title text-muted">Total Profit</h6>
+                                <h3 class="card-text text-success">
+                                    ${{ '{:,.2f}'.format(1458.75) }}
+                                    <small class="text-muted fs-6">
+                                        <i class="fas fa-arrow-up text-success"></i> 12.4%
+                                    </small>
+                                </h3>
+                                <div class="progress mt-2" style="height: 5px;">
+                                    <div class="progress-bar bg-success" style="width: 78%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card bg-dark border-primary h-100">
+                            <div class="card-body">
+                                <h6 class="card-title text-muted">Win Rate</h6>
+                                <h3 class="card-text text-white">
+                                    68.4%
+                                    <small class="text-muted fs-6">
+                                        <i class="fas fa-arrow-up text-success"></i> 2.1%
+                                    </small>
+                                </h3>
+                                <div class="progress mt-2" style="height: 5px;">
+                                    <div class="progress-bar bg-primary" style="width: 68.4%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card bg-dark border-warning h-100">
+                            <div class="card-body">
+                                <h6 class="card-title text-muted">Active Trades</h6>
+                                <h3 class="card-text text-white">
+                                    {{ '{:,}'.format(strategy_count|default(0)) }}
+                                    <small class="text-muted fs-6">
+                                        <i class="fas fa-arrow-up text-success"></i> 3
+                                    </small>
+                                </h3>
+                                <div class="progress mt-2" style="height: 5px;">
+                                    <div class="progress-bar bg-warning" style="width: 45%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card bg-dark border-danger h-100">
+                            <div class="card-body">
+                                <h6 class="card-title text-muted">Max Drawdown</h6>
+                                <h3 class="card-text text-white">
+                                    4.8%
+                                    <small class="text-muted fs-6">
+                                        <i class="fas fa-arrow-down text-danger"></i> 0.3%
+                                    </small>
+                                </h3>
+                                <div class="progress mt-2" style="height: 5px;">
+                                    <div class="progress-bar bg-danger" style="width: 4.8%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart & Recent Trades -->
+            <div class="p-3">
+                <div class="row g-3">
+                    <!-- Chart -->
+                    <div class="col-md-8">
+                        <div class="card bg-dark">
+                            <div class="card-header bg-dark border-bottom border-secondary d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Performance History</h5>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-secondary">Day</button>
+                                    <button class="btn btn-sm btn-outline-primary">Week</button>
+                                    <button class="btn btn-sm btn-primary">Month</button>
+                                    <button class="btn btn-sm btn-outline-secondary">Year</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div style="height: 300px; background-color: #1a202c; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+                                    <p class="text-muted">Performance Chart (Interactive chart will be implemented here)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Trades -->
+                    <div class="col-md-4">
+                        <div class="card bg-dark h-100">
+                            <div class="card-header bg-dark border-bottom border-secondary d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Recent Trades</h5>
+                                <a href="#" class="text-primary small">View All</a>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="list-group list-group-flush border-bottom scrollarea">
+                                    {% if recent_trades %}
+                                        {% for trade in recent_trades %}
+                                        <div class="list-group-item list-group-item-action py-3 bg-dark border-secondary">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6 class="mb-1">{{ trade.symbol }}</h6>
+                                                    <small class="text-muted">{{ trade.open_time.strftime('%Y-%m-%d %H:%M') }}</small>
+                                                </div>
+                                                <div class="text-end">
+                                                    <span class="badge {% if trade.profit > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                                        {{ '{:+.2f}'.format(trade.profit) }}
+                                                    </span>
+                                                    <div>
+                                                        <small class="text-muted">{{ trade.trade_type }}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="list-group-item bg-dark border-secondary text-center py-4">
+                                            <p class="text-muted mb-0">No recent trades</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strategies & Accounts -->
+            <div class="p-3">
+                <div class="row g-3">
+                    <!-- Strategies -->
+                    <div class="col-md-6">
+                        <div class="card bg-dark">
+                            <div class="card-header bg-dark border-bottom border-secondary d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Trading Strategies</h5>
+                                <a href="{{ url_for('strategy_list') }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus me-1"></i> New
+                                </a>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-dark table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Type</th>
+                                                <th>Status</th>
+                                                <th>Win Rate</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% if strategies %}
+                                                {% for strategy in strategies %}
+                                                <tr>
+                                                    <td>
+                                                        <a href="{{ url_for('strategy_detail', id=strategy.id) }}" class="text-decoration-none text-info">
+                                                            {{ strategy.name }}
+                                                        </a>
+                                                    </td>
+                                                    <td>{{ strategy.strategy_type }}</td>
+                                                    <td>
+                                                        <span class="badge bg-success">Active</span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="progress" style="height: 5px;">
+                                                            <div class="progress-bar bg-primary" style="width: 68%"></div>
+                                                        </div>
+                                                        <small class="text-muted">68%</small>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            {% else %}
+                                                <tr>
+                                                    <td colspan="4" class="text-center text-muted py-4">
+                                                        No strategies yet. Create one to get started.
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Trading Accounts -->
+                    <div class="col-md-6">
+                        <div class="card bg-dark">
+                            <div class="card-header bg-dark border-bottom border-secondary d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Trading Accounts</h5>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus me-1"></i> Add
+                                </button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-dark table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Broker</th>
+                                                <th>Balance</th>
+                                                <th>Type</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% if accounts %}
+                                                {% for account in accounts %}
+                                                <tr>
+                                                    <td>{{ account.name }}</td>
+                                                    <td>{{ account.broker }}</td>
+                                                    <td>${{ '{:,.2f}'.format(account.balance) }}</td>
+                                                    <td>
+                                                        {% if account.is_demo %}
+                                                        <span class="badge bg-info">Demo</span>
+                                                        {% else %}
+                                                        <span class="badge bg-success">Real</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            {% else %}
+                                                <tr>
+                                                    <td colspan="4" class="text-center text-muted py-4">
+                                                        No trading accounts set up yet.
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!-- Include necessary JavaScript for the dashboard -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script>
+    // Add interactive features for AI assistants
+    document.querySelectorAll('.ai-assistant').forEach(assistant => {
+        assistant.addEventListener('click', function() {
+            const aiId = this.getAttribute('data-ai');
+            const aiMessage = document.getElementById(`${aiId}-message`);
+            const icon = this.querySelector('.fa-chevron-down');
+            
+            aiMessage.classList.toggle('active');
+            icon.classList.toggle('fa-rotate-180');
+        });
+    });
+</script>
+{% endblock %}
